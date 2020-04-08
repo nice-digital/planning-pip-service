@@ -40,7 +40,7 @@ namespace P_WCF
         public void SendEmail(string whichapp, int P_EmailID)
         {
 
-            Logger.Debug("Called P_WCF with environment " + whichapp + " for email " + P_EmailID.ToString());
+            Logger.Debug("Calling P_WCF for environment " + whichapp + " and email " + P_EmailID.ToString());
             
             string ConnectionString = WebConfigurationManager.AppSettings["ConnectionString"];
             string MailServer = WebConfigurationManager.AppSettings["MailServer"];
@@ -360,6 +360,7 @@ namespace P_WCF
             }
 
             smtpClient.Dispose();
+            Logger.Debug("Finished calling P_WCF for environment " + whichapp + " and email " + P_EmailID.ToString());
         }
 
         private bool isEmail(string inputEmail)
