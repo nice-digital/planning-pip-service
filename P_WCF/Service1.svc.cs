@@ -17,6 +17,8 @@ namespace P_WCF
     // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Service1" in code, svc and config file together.
     public class Service1 : IService1
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
         public string GetData(int value)
         {
             return string.Format("You entered: {0}", value);
@@ -38,6 +40,8 @@ namespace P_WCF
         public void SendEmail(string whichapp, int P_EmailID)
         {
 
+            Logger.Debug("Called P_WCF with environment " + whichapp + " for email " + P_EmailID.ToString());
+            
             string ConnectionString = WebConfigurationManager.AppSettings["ConnectionString"];
             string MailServer = WebConfigurationManager.AppSettings["MailServer"];
 
@@ -52,18 +56,22 @@ namespace P_WCF
             // Add Parameters to SPROC
             myCommand.Parameters.Add("@P_EmailID", SqlDbType.Int).Value = P_EmailID;
 
-            DataSet ds;
+            DataSet ds = new DataSet();
 
             try
             {
                 //create the DataAdapter & DataSet
                 myConnection.Open();
                 SqlDataAdapter da = new SqlDataAdapter(myCommand);
-                ds = new DataSet();
 
                 //fill the DataSet using default values for DataTable names, etc.
                 da.Fill(ds, "EmailDetails");
-
+            }
+            catch (Exception ex)
+            {
+                ds.Dispose();
+                Logger.Error(ex);
+                throw;
             }
             finally
             {
@@ -178,9 +186,12 @@ namespace P_WCF
             myConnection.Close();
 
             bool ErrorHappened = false;
+            LinkedResource imagelink;
 
             foreach (DataRow dr1 in dtRecipients.Rows)
             {
+                Logger.Debug("Sending email to EmailRecipientID " + dr1["EmailRecipientID"].ToString());
+
                 ErrorHappened = false;
 
                 MailMessage message = new MailMessage();
@@ -194,7 +205,17 @@ namespace P_WCF
                     logopath = "C:\\NICELogo\\NICE-Master-72dpi-MIN.png";
                 }
 
-                LinkedResource imagelink = new LinkedResource(logopath, "image/png");
+                try
+                {
+                    imagelink = new LinkedResource(logopath, "image/png");
+                }
+                catch (Exception logoException)
+                {
+                    Logger.Error("Error loading logo image");
+                    Logger.Error(logoException);
+                    throw;
+                }
+
                 imagelink.ContentId = "imageId";
                 imagelink.TransferEncoding = System.Net.Mime.TransferEncoding.Base64;
 
@@ -206,6 +227,7 @@ namespace P_WCF
                 {
                     htmlView.LinkedResources.Add(imagelink);
                 }
+                Logger.Debug("Logo image added");
 
                 //add the views
                 message.AlternateViews.Add(plainView);
@@ -213,7 +235,7 @@ namespace P_WCF
 
                 if (isEmail(EmailAddress) == true)
                 {
-
+                    Logger.Debug("Email address for EmailRecipientID " + dr1["EmailRecipientID"].ToString() + " is valid");
                     try
                     {
                         MailAddress fromAddress = new MailAddress(ReplyToAddress, "National Institute for Health and Care Excellence");
@@ -238,10 +260,12 @@ namespace P_WCF
 
                         smtpClient.Host = MailServer;
                         smtpClient.Send(message);
+                        Logger.Debug("Email sent to EmailRecipientID " + dr1["EmailRecipientID"].ToString());
                     }
                     catch (SmtpException Smtpex)
                     {
                         ErrorHappened = true;
+                        Logger.Error(Smtpex);
                         //write the exception to the database - already have connection and command objects
                         string ErrorMessage = Smtpex.Message.ToString();
                         if (ErrorMessage.Length >= 1000)
@@ -263,6 +287,7 @@ namespace P_WCF
                     catch (Exception ex)
                     {
                         ErrorHappened = true;
+                        Logger.Error(ex);
                         //write the exception to the database - already have connection and command objects
                         string ErrorMessage = ex.Message.ToString();
                         if (ErrorMessage.Length >= 1000)
