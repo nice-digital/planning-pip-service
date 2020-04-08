@@ -199,11 +199,7 @@ namespace P_WCF
                 EmailAddress = dr1["EmailAddress"].ToString();
                 Recipient = dr1["Recipient"].ToString();
 
-                string logopath = "W:\\WebSites\\NICELogo\\NICE-Master-72dpi-MIN.png";
-                if (whichapp == "LIVE")
-                {
-                    logopath = "C:\\NICELogo\\NICE-Master-72dpi-MIN.png";
-                }
+                string logopath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "images", "NICE-Master-72dpi-MIN.png");
 
                 try
                 {

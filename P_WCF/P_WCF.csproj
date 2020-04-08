@@ -73,6 +73,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="images\NICE-Master-72dpi-MIN.png" />
     <Content Include="NLog.xsd" />
     <Content Include="Service1.svc" />
     <Content Include="Web.config">
