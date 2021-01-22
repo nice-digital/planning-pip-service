@@ -109,7 +109,7 @@ namespace P_WCF
             string MessageHeader;
             string MessageFooter;
             string ManchesterHeader = "<p style=\"font-size:11px; margin-top:1em;\">Level 1A, City Tower<br />Piccadilly Plaza<br />Manchester<br />M1 4BT<br /><br />Tel: 0300 323 0140<br />Fax: 0845 003 7784<br /><br />www.nice.org.uk<br /></p><p>&nbsp;</p>";
-            string LondonHeader = "<p style=\"font-size:11px; margin-top:1em;\">1st Floor<br />10 Spring Gardens<br />London<br />SW1A 2BU<br /><br />Tel: 0300 323 0140<br />Fax: 0845 003 7784<br /><br />www.nice.org.uk</p><p>&nbsp;</p>";
+            string LondonHeader = "<p style=\"font-size:11px; margin-top:1em;\">2nd Floor<br />2 Redman Place<br />London<br />E20 1JQ<br /><br />Tel: 020 7045 2307<br />Fax: 0845 003 7784<br /><br />www.nice.org.uk</p><p>&nbsp;</p>";
             string todaysDate = DateTime.Now.ToShortDateString();
 
             MessageHeader = "<html>";
